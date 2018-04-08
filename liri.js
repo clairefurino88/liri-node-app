@@ -1,17 +1,13 @@
 require("dotenv").config();
 
 var fs = require("fs");
-
 var request = require("request");
-
 var keys = require("./keys.js");
 
 var Twitter = require("twitter");
-
 var client = new Twitter(keys.twitter);
 
 var Spotify = require("node-spotify-api");
-
 var spotify = new Spotify(keys.spotify);
 
 var operation = process.argv[2];
@@ -20,6 +16,8 @@ var movieName = process.argv[3];
 
 var queryUrl = "http://www.omdbapi.com/?t=" + movieName + "&y=&plot=short&apikey=trilogy";
 
+
+
 if (operation === "my-tweets") {
     my_Tweets();
 }
@@ -27,7 +25,6 @@ else if (operation === "spotify-this-song") {
     spotify_this_song();
 }
 else if (operation === "movie-this") {
-    // console.log(queryUrl);
     movie_this();
 }
 else if (operation === "do-what-it-says") {
@@ -39,16 +36,16 @@ function my_Tweets() {
     client.get('statuses/user_timeline', { count: 20 }, function (error, tweets, response) {
         if (!error) {
             for (var i = 0; i < tweets.length; i++) {
-                console.log("\nTweet: ", tweets[i].text);
-                console.log("Created at: ", tweets[i].created_at);
+                
+                console.log("\n", i + 1);
+                console.log("Tweet: ", tweets[i].text);
+                console.log("Posted at: ", tweets[i].created_at);
             }
         }
         else {
             return console.log(error);
         }
-
     });
-    
 }
 
 function spotify_this_song() {
@@ -63,6 +60,7 @@ function spotify_this_song() {
                     }
                     console.log("External Link: ", data.albums.items[i].external_urls.spotify, "\n");
                 }
+                //console.log(data.albums.items[0]);
             }
             else {
                 return console.log('Error occurred: ' + err);
@@ -120,7 +118,13 @@ function movie_this() {
                 console.log("\nTitle: ", JSON.parse(body).Title);
                 console.log("Release Date: ", JSON.parse(body).Released);
                 console.log("IMDB Rating: ", JSON.parse(body).imdbRating);
-                console.log("Rotten Tomatoes Rating: ", JSON.parse(body).Ratings[1].Value);
+                if (JSON.parse(body).Ratings[1].Source === "Rotten Tomatoes")
+                {
+                    console.log("Rotten Tomatoes Rating: ", JSON.parse(body).Ratings[1].Value);
+                }
+                else{
+                    console.log("Rotten Tomatoes Rating: N/A");
+                }
                 console.log("Country: ", JSON.parse(body).Country);
                 console.log("Language: ", JSON.parse(body).Language);
                 console.log("Plot: ", JSON.parse(body).Plot);
@@ -139,7 +143,9 @@ function do_what_it_says() {
             var dataArr = data.split(",");
             operation = dataArr[0];
             songName = dataArr[1];
-            spotify_this_song();
+            if(operation === "spotify-this-song"){
+                spotify_this_song();
+            }
         }
         else {
             return console.log(error);
