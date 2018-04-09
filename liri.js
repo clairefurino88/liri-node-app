@@ -84,10 +84,24 @@ function spotify_call() {
 }
 
 /************************************FUNCTION FOR MOVIES***************************************/
-function movie_call(movieName) {
+function movie_call() {
+    if (!movieName) {
+        request("http://www.omdbapi.com/?t=Mr.Nobody&y=&plot=short&apikey=trilogy", function(error, response, body) {
+            console.log("Title: " + JSON.parse(body).Title);
+            console.log("Year: " + JSON.parse(body).Year);
+            console.log("IMDB Score: " + JSON.parse(body).imdbRating);
+            console.log("RT Score: " + JSON.parse(body).Ratings[1].Value);
+            console.log("Country: " + JSON.parse(body).Country);
+            console.log("Language: " + JSON.parse(body).Language);
+            console.log("Plot: " + JSON.parse(body).Plot);
+            console.log("Actors: " + JSON.parse(body).Actors);
+        });
+    }
+
+    else {
     request("http://www.omdbapi.com/?t=" + movieName + "&plot=short&apikey=trilogy&tomatoes=true", function(error, response, body) {
-        if(movieName === undefined) {
-            return console.log("Please enter a movie name in quotes");
+        if(error) {
+            return console.log("There has been an error: " + error);
         }
         if (!error && response.statusCode === 200) {
             console.log("Title: " + JSON.parse(body).Title);
@@ -100,6 +114,7 @@ function movie_call(movieName) {
             console.log("Actors: " + JSON.parse(body).Actors);
         }
     });
+ } //else function
 }
 
 /*******************************FUNCTION FOR TEXT INSIDE RANDOM.TXT**************************************/
